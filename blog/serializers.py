@@ -3,7 +3,7 @@
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 from rest_framework import serializers
-from .models import Comment, Like, Post, PostView
+from .models import Comment, Like, Blog, BlogView
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -47,7 +47,7 @@ class PostViewSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
-        model = PostView
+        model = BlogView
         fields = ('id', 'post', 'user')
 
     def create(self, validated_data):
@@ -70,9 +70,9 @@ class PostSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField()
 
     class Meta:
-        model = Post
+        model = Blog
         fields = ('id', 'user', 'author', 'title', 'content', 'image',
-                  'createdDate', 'updatedDate', 'days_since_creation', 'category', 'likes', 'like_count', 'views', 'view_count', 'comment_count', 'comments')
+                  'createdDate', 'updatedTime', 'days_since_creation', 'category', 'likes', 'like_count', 'views', 'view_count', 'comment_count', 'comments')
 
     def get_days_since_creation(self, obj):
         return (now() - obj.createdDate).days

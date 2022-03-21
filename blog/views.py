@@ -2,7 +2,7 @@
 from rest_framework import generics, status
 from rest_framework.permissions import (IsAuthenticated, IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-from .models import Comment, Like, Post, PostView
+from .models import Comment, Like, Blog, BlogView
 from .pagination import CursorPagi, Pagination
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (CommentSerializer, LikeSerializer, PostSerializer, PostViewSerializer)
@@ -10,7 +10,7 @@ from .serializers import (CommentSerializer, LikeSerializer, PostSerializer, Pos
 
 # Create your views here.
 class PostList(generics.ListCreateAPIView):
-    queryset = Post.objects.all()
+    queryset = Blog.objects.all()
     serializer_class = PostSerializer
     pagination_class = Pagination
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -24,7 +24,7 @@ class PostList(generics.ListCreateAPIView):
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Post.objects.all()
+    queryset = Blog.objects.all()
     serializer_class = PostSerializer
     lookup_field = 'id'
     permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
@@ -70,10 +70,10 @@ class LikeList(generics.ListCreateAPIView):
 
 
 class PostViewList(generics.ListCreateAPIView):
-    queryset = PostView.objects.all()
+    queryset = BlogView.objects.all()
     serializer_class = PostViewSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         post_id = self.kwargs['id']
-        return PostView.objects.filter(post=post_id)
+        return BlogView.objects.filter(post=post_id)
