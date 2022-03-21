@@ -1,47 +1,52 @@
-
 from django.db import models
-# from users.forms import UserForm   
-# from users.models import Profile
 from django.contrib.auth.models import User
 from django.conf import settings
-
+from django.utils.timezone import now
+# Create your models here.
 class Blog(models.Model):
-    title = models.CharField(max_length=50)
-    content = models.TextField()
-    image = models.ImageField(upload_to="blogs/", default="avatar.png")
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
-    
-    Category =(
-        ("1", "Tecnology"),
-        ("2", "Social"),
-        ("3", "Travel"),
-        ("4", "Other"),
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE, default=1)
+    title = models.CharField(max_length=100)
+    slug = models.CharField(max_length=100)
+    content = models.TextField(max_length=500)
+    image = models.ImageField(upload_to="profile_pics", blank=True, null=True)
+    dateTime = models.DateTimeField(auto_now_add=True)
+    updatedTime = models.DateTimeField(auto_now=True)
+    Category = (
+        ("1", "Travel"),
+        ("2", "Programming"),
+        ("3", "Beauty"),
+        ("4", "Healt"),
+        ("5", "Spor"),
+        ("6", "Other"),
     )
-    
-    # Status =(
-    #     ("1", "Draft"),
-    #     ("2", "View"),
-    # )
-    
-    category = models.CharField(max_length=50, choices=Category)
-    # status = models.CharField(max_length=50, choices=Status)
-    date_created=models.DateTimeField(auto_now_add=True, null=True)
-    likes=models.ManyToManyField(User, related_name='blog_posts')
-    post_views=models.IntegerField(default=0, null=True, blank=True)
-
-    def total_likes(self):
-        return self.likes.count()
-    
+    Status = (
+        ("D", "Draft"),
+        ("V", "View"),
+    )
+    category = models.CharField(max_length=20, choices=Category, default='6')
+    status = models.CharField(max_length=6, choices=Status, default='D')
     def __str__(self):
-        return f"{self.author} {self.title}"
-    
-
+        return f"{self.user} {self.title}"
 class Comment(models.Model):
-    post= models.ForeignKey(Blog, related_name='comments', on_delete=models.CASCADE)
-    name=models.CharField(max_length=50)
-    body=models.TextField()
-    date_added=models.DateTimeField(auto_now_add=True)
-    
+    blog = models.ForeignKey(
+        Blog, related_name='comments', on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    body = models.TextField(max_length=250)
+    dateTime = models.DateTimeField(default=now)
     def __str__(self):
-        return f"{self.post.title}{self.name}"
-    
+        return f'{self.user}{self.body}'
+class Like(models.Model):
+    blog = models.ForeignKey(
+        Blog, on_delete=models.CASCADE, related_name='likes',)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    dateTime = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f'{self.user} {self.blog}'
+class BlogView(models.Model):
+    blog = models.ForeignKey(
+        Blog, on_delete=models.CASCADE, related_name='views',)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    dateTime = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f'{self.user} {self.blog}'
